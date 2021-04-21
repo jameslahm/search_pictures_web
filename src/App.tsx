@@ -43,13 +43,15 @@ function App() {
     query ? query : null,
     (query) => {
       timeRef.current.startTime = performance.now();
-      return fetch(`/search?query=${query}`, { method: "GET" }).then((res) => {
-        timeRef.current.endTime = performance.now();
-        timeRef.current.elapsed = Math.ceil(
-          timeRef.current.endTime - timeRef.current.startTime
-        );
-        return res.json();
-      });
+      return fetch(`/api/search?query=${query}`, { method: "GET" }).then(
+        (res) => {
+          timeRef.current.endTime = performance.now();
+          timeRef.current.elapsed = Math.ceil(
+            timeRef.current.endTime - timeRef.current.startTime
+          );
+          return res.json();
+        }
+      );
     }
   );
   if (!searchResults) {
@@ -138,7 +140,6 @@ function App() {
               Array(27)
                 .fill(0)
                 .map((_, index) => {
-                  console.log(searchResults);
                   return (
                     <Skeleton
                       key={index}

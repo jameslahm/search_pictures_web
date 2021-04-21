@@ -8,7 +8,7 @@ const unsplash = createApi({
 const ORIGIN = window.location.origin;
 
 const handlers = [
-  rest.get(`${ORIGIN}/search`, async (req, res, ctx) => {
+  rest.get(`${ORIGIN}/api/search`, async (req, res, ctx) => {
     const pictures = (
       await unsplash.search.getPhotos({
         query: req.url.searchParams.get("query") || "cat",
