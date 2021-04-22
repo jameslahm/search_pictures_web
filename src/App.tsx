@@ -5,17 +5,16 @@ import {
   extendTheme,
   Flex,
   Heading,
-  SimpleGrid,
   Image,
-  Skeleton,
   ScaleFade,
   Text,
 } from "@chakra-ui/react";
-import { motion } from "framer-motion";
 import { useCallback, useRef, useState } from "react";
 import useSWR from "swr";
 import SearchInput from "./components/SearchInput";
 import BannerImage from "./banner.svg";
+import { ImageResultProp } from "./types";
+import ImageGrid from "./components/ImageGrid";
 
 const theme = extendTheme({
   fonts: {
@@ -23,16 +22,6 @@ const theme = extendTheme({
     body: "'Inter', sans-serif;",
   },
 });
-
-interface ImageResultProp {
-  alt_description: string;
-  id: string;
-  urls: {
-    thumb: string;
-    raw: string;
-    small: string;
-  };
-}
 
 function App() {
   const [initialSearch, setInitialSearch] = useState(true);
@@ -105,53 +94,12 @@ function App() {
               </Box>
             </Flex>
           </ScaleFade>
-          <SimpleGrid width="100%" minChildWidth="120px" spacing="20px">
-            {searchResults ? (
-              searchResults.map((image, index) => {
-                return (
-                  <motion.div
-                    whileHover={{
-                      scale: 1.1,
-                      rotate: index % 2 === 0 ? "10deg" : "-10deg",
-                    }}
-                    whileTap={{ scale: 0.95 }}
-                    key={image.id}
-                  >
-                    <Image
-                      fallback={
-                        <Skeleton
-                          key={image.id}
-                          width="120px"
-                          height="120px"
-                        ></Skeleton>
-                      }
-                      cursor="pointer"
-                      borderRadius="md"
-                      boxShadow="2xl"
-                      src={image.urls.thumb}
-                      boxSize="120px"
-                      objectFit="cover"
-                      alt={image.alt_description}
-                    />
-                  </motion.div>
-                );
-              })
-            ) : query ? (
-              Array(27)
-                .fill(0)
-                .map((_, index) => {
-                  return (
-                    <Skeleton
-                      key={index}
-                      width="120px"
-                      height="120px"
-                    ></Skeleton>
-                  );
-                })
-            ) : (
-              <Image mt={8} src={BannerImage}></Image>
-            )}
-          </SimpleGrid>
+
+          {query ? (
+            <ImageGrid searchResults={searchResults}></ImageGrid>
+          ) : (
+            <Image mt={8} src={BannerImage}></Image>
+          )}
         </Flex>
       )}
     </ChakraProvider>
