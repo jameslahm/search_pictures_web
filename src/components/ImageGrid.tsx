@@ -14,19 +14,16 @@ import {
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import React, { useRef, useState } from "react";
-import { ImageResultProp } from "../types";
 
-const ImageGrid: React.FC<{ searchResults: ImageResultProp[] | undefined }> = ({
-  searchResults,
-}) => {
+const ImageGrid: React.FC<{ images: string[] | undefined }> = ({ images }) => {
   const { isOpen, onClose, onOpen } = useDisclosure({ defaultIsOpen: false });
-  const [focusImage, setFocusImage] = useState({ urls: {} } as ImageResultProp);
+  const [focusImage, setFocusImage] = useState("");
   const initialFocusRef = useRef(null);
   return (
     <>
       <SimpleGrid width="100%" minChildWidth="120px" spacing="20px">
-        {searchResults
-          ? searchResults.map((image, index) => {
+        {images
+          ? images.map((image, index) => {
               return (
                 <motion.div
                   whileHover={{
@@ -37,12 +34,12 @@ const ImageGrid: React.FC<{ searchResults: ImageResultProp[] | undefined }> = ({
                     setFocusImage(image);
                     onOpen();
                   }}
-                  key={image.id}
+                  key={image}
                 >
                   <Image
                     fallback={
                       <Skeleton
-                        key={image.id}
+                        key={image}
                         width="120px"
                         height="120px"
                       ></Skeleton>
@@ -50,10 +47,10 @@ const ImageGrid: React.FC<{ searchResults: ImageResultProp[] | undefined }> = ({
                     cursor="pointer"
                     borderRadius="md"
                     boxShadow="2xl"
-                    src={image.urls.thumb}
+                    src={image}
                     boxSize="120px"
                     objectFit="cover"
-                    alt={image.alt_description}
+                    alt={image}
                   />
                 </motion.div>
               );
@@ -74,14 +71,14 @@ const ImageGrid: React.FC<{ searchResults: ImageResultProp[] | undefined }> = ({
       >
         <ModalOverlay></ModalOverlay>
         <ModalContent>
-          <ModalHeader textTransform="capitalize" isTruncated maxWidth="lg">
-            {focusImage.alt_description || "Image !"}
+          <ModalHeader isTruncated maxWidth="lg">
+            {focusImage || "Cute Image !"}
           </ModalHeader>
           <ModalCloseButton></ModalCloseButton>
           <ModalBody>
             <Image
-              src={focusImage.urls.small}
-              alt={focusImage.alt_description}
+              src={focusImage}
+              alt={focusImage}
               fallback={<Skeleton width="100%" height="xs"></Skeleton>}
               boxShadow="lg"
               width="100%"

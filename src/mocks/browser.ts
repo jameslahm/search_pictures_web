@@ -9,14 +9,16 @@ const ORIGIN = window.location.origin;
 
 const handlers = [
   rest.get(`${ORIGIN}/api/search`, async (req, res, ctx) => {
-    const pictures = (
+    const data = (
       await unsplash.search.getPhotos({
         query: req.url.searchParams.get("query") || "cat",
         page: 1,
         perPage: 20,
       })
     ).response?.results;
-    console.log(pictures);
+    const pictures = data?.map((picture) => {
+      return picture.urls.small;
+    });
     return res(ctx.status(200), ctx.delay(500), ctx.json(pictures));
   }),
 ];

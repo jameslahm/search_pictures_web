@@ -13,8 +13,9 @@ import { useCallback, useRef, useState } from "react";
 import useSWR from "swr";
 import SearchInput from "./components/SearchInput";
 import BannerImage from "./banner.svg";
-import { ImageResultProp } from "./types";
 import ImageGrid from "./components/ImageGrid";
+
+const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const theme = extendTheme({
   fonts: {
@@ -28,30 +29,33 @@ function App() {
   const timeRef = useRef({ startTime: -1, endTime: -1, elapsed: -1 });
 
   const [query, setQuery] = useState("");
-  const { data: searchResults } = useSWR<ImageResultProp[], Error>(
-    query ? query : null,
-    (query) => {
+  const [modelType, setModelType] = useState("semantic");
+  const { data: images } = useSWR<string[], Error>(
+    query ? [query, modelType] : null,
+    (query, modelType) => {
       timeRef.current.startTime = performance.now();
-      return fetch(`/api/search?query=${query}`, { method: "GET" }).then(
-        (res) => {
-          timeRef.current.endTime = performance.now();
-          timeRef.current.elapsed = Math.ceil(
-            timeRef.current.endTime - timeRef.current.startTime
-          );
-          return res.json();
-        }
-      );
+      return fetch(`${BASE_URL}/api/search?query=${query}&model=${modelType}`, {
+        method: "GET",
+      }).then((res) => {
+        timeRef.current.endTime = performance.now();
+        timeRef.current.elapsed = Math.ceil(
+          timeRef.current.endTime - timeRef.current.startTime
+        );
+        return res.json();
+      });
     }
   );
-  if (!searchResults) {
+  if (!images) {
     timeRef.current.elapsed = -1;
   }
   const handleSubmit = useCallback(
-    (query) => {
+    (query, modelType) => {
       if (initialSearch) {
         setInitialSearch(false);
       }
+      console.log(query, modelType);
       setQuery(query);
+      setModelType(modelType);
     },
     [initialSearch]
   );
@@ -96,7 +100,7 @@ function App() {
           </ScaleFade>
 
           {query ? (
-            <ImageGrid searchResults={searchResults}></ImageGrid>
+            <ImageGrid images={images}></ImageGrid>
           ) : (
             <Image mt={8} src={BannerImage}></Image>
           )}
