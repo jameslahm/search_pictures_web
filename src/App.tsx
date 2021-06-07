@@ -30,13 +30,17 @@ function App() {
 
   const [query, setQuery] = useState("");
   const [modelType, setModelType] = useState("semantic");
+  const [count, setCount] = useState(20);
   const { data: images } = useSWR<string[], Error>(
-    query ? [query, modelType] : null,
-    (query, modelType) => {
+    query ? [query, count, modelType] : null,
+    (query, count, modelType) => {
       timeRef.current.startTime = performance.now();
-      return fetch(`${BASE_URL}/api/search?query=${query}&model=${modelType}`, {
-        method: "GET",
-      }).then((res) => {
+      return fetch(
+        `${BASE_URL}/api/search?query=${query}&counts=${count}&model=${modelType}`,
+        {
+          method: "GET",
+        }
+      ).then((res) => {
         timeRef.current.endTime = performance.now();
         timeRef.current.elapsed = Math.ceil(
           timeRef.current.endTime - timeRef.current.startTime
@@ -49,13 +53,14 @@ function App() {
     timeRef.current.elapsed = -1;
   }
   const handleSubmit = useCallback(
-    (query, modelType) => {
+    (query, count, modelType) => {
       if (initialSearch) {
         setInitialSearch(false);
       }
       console.log(query, modelType);
       setQuery(query);
       setModelType(modelType);
+      setCount(count);
     },
     [initialSearch]
   );

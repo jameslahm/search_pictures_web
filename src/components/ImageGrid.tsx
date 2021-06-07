@@ -1,3 +1,4 @@
+import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 import {
   SimpleGrid,
   Skeleton,
@@ -11,6 +12,8 @@ import {
   ModalBody,
   ModalFooter,
   Button,
+  IconButton,
+  Box,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import React, { useRef, useState } from "react";
@@ -18,6 +21,7 @@ import React, { useRef, useState } from "react";
 const ImageGrid: React.FC<{ images: string[] | undefined }> = ({ images }) => {
   const { isOpen, onClose, onOpen } = useDisclosure({ defaultIsOpen: false });
   const [focusImage, setFocusImage] = useState("");
+  const [scale, setScale] = useState(1);
   const initialFocusRef = useRef(null);
   return (
     <>
@@ -67,7 +71,7 @@ const ImageGrid: React.FC<{ images: string[] | undefined }> = ({ images }) => {
         initialFocusRef={initialFocusRef}
         isOpen={isOpen}
         onClose={onClose}
-        size="xl"
+        size="2xl"
       >
         <ModalOverlay></ModalOverlay>
         <ModalContent>
@@ -75,20 +79,39 @@ const ImageGrid: React.FC<{ images: string[] | undefined }> = ({ images }) => {
             {focusImage || "Cute Image !"}
           </ModalHeader>
           <ModalCloseButton></ModalCloseButton>
-          <ModalBody>
+          <ModalBody display="flex" justifyContent="center" alignItems="center">
             <Image
+              onWheel={(event) => {
+                setScale(scale - 0.01 * event.deltaY);
+              }}
               src={focusImage}
               alt={focusImage}
               fallback={<Skeleton width="100%" height="xs"></Skeleton>}
               boxShadow="lg"
-              width="100%"
-              maxHeight="md"
+              maxWidth="100%"
+              height={`${100 * scale}px`}
               borderRadius="md"
-              objectFit="cover"
+              objectFit="fill"
               ref={initialFocusRef}
             ></Image>
           </ModalBody>
           <ModalFooter>
+            <IconButton
+              onClick={() => {
+                setScale(scale * 1.2);
+              }}
+              mr={2}
+              aria-label="Scale Big"
+              icon={<AddIcon></AddIcon>}
+            ></IconButton>
+            <IconButton
+              onClick={() => {
+                setScale(scale * 0.8);
+              }}
+              aria-label="Scale Small"
+              icon={<MinusIcon></MinusIcon>}
+            ></IconButton>
+            <Box flex={1}></Box>
             <Button onClick={onClose}>Close</Button>
           </ModalFooter>
         </ModalContent>
